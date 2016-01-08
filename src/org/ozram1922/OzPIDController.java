@@ -19,30 +19,30 @@ import edu.wpi.first.wpilibj.util.BoundaryException;
  */
 public class OzPIDController implements LiveWindowSendable, Controller {
 
-    public static final double kDefaultPeriod = .05;
-    private static int instances = 0;
-    private double m_P;     // factor for "proportional" control
-    private double m_I;     // factor for "integral" control
-    private double m_D;     // factor for "derivative" control
-    private double m_F;                 // factor for feedforward term
-    private double m_maximumOutput = 1.0; // |maximum output|
-    private double m_minimumOutput = -1.0;  // |minimum output|
-    private double m_maximumInput = 0.0;    // maximum input - limit setpoint to this
-    private double m_minimumInput = 0.0;    // minimum input - limit setpoint to this
-    private boolean m_continuous = false; // do the endpoints wrap around? eg. Absolute encoder
-    private boolean m_enabled = false;    //is the pid controller enabled
-    private double m_prevError = 0.0; // the prior sensor input (used to compute velocity)
-    private double m_totalError = 0.0; //the sum of the errors for use in the integral calc
-    private Tolerance m_tolerance;  //the tolerance object used to check if on target
-    private double m_setpoint = 0.0;
-    private double m_error = 0.0;
-    private double m_result = 0.0;
-    private double m_period = kDefaultPeriod;
-    PIDSource m_pidInput;
-    PIDOutput m_pidOutput;
-    java.util.Timer m_controlLoop;
-    private boolean m_freed = false;
-    private boolean m_usingPercentTolerance;
+    public static final double msDefaultPeriod = .05;
+    private static int msInstances = 0;
+    private double mP;     // factor for "proportional" control
+    private double mI;     // factor for "integral" control
+    private double mD;     // factor for "derivative" control
+    private double mF;                 // factor for feedforward term
+    private double mMaximumOutput = 1.0; // |maximum output|
+    private double mMinimumOutput = -1.0;  // |minimum output|
+    private double mMaximumInput = 0.0;    // maximum input - limit setpoint to this
+    private double mMinimumInput = 0.0;    // minimum input - limit setpoint to this
+    private boolean mContinuous = false; // do the endpoints wrap around? eg. Absolute encoder
+    private boolean mEnabled = false;    //is the pid controller enabled
+    private double mPrevError = 0.0; // the prior sensor input (used to compute velocity)
+    private double mTotalError = 0.0; //the sum of the errors for use in the integral calc
+    private Tolerance mTolerance;  //the tolerance object used to check if on target
+    private double mSetpoint = 0.0;
+    private double mError = 0.0;
+    private double mResult = 0.0;
+    private double mPeriod = msDefaultPeriod;
+    PIDSource mPidInput;
+    PIDOutput mPidOutput;
+    java.util.Timer mControlLoop;
+    private boolean mFreed = false;
+    private boolean mUsingPercentTolerance;
 
     /**
      * Tolerance is the type of tolerance used to specify if the PID controller is on target.
@@ -63,7 +63,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
         @Override
     public boolean onTarget() {
             return (Math.abs(getError()) < percentage / 100
-                    * (m_maximumInput - m_minimumInput));
+                    * (mMaximumInput - mMinimumInput));
         }
     }
 
@@ -90,18 +90,18 @@ public class OzPIDController implements LiveWindowSendable, Controller {
 
     private class PIDTask extends TimerTask {
 
-        private OzPIDController m_controller;
+        private OzPIDController mController;
 
         public PIDTask(OzPIDController controller) {
             if (controller == null) {
                 throw new NullPointerException("Given OzPIDController was null");
             }
-            m_controller = controller;
+            mController = controller;
         }
 
         @Override
     public void run() {
-            m_controller.calculate();
+            mController.calculate();
         }
     }
 
@@ -127,23 +127,23 @@ public class OzPIDController implements LiveWindowSendable, Controller {
             throw new NullPointerException("Null PIDOutput was given");
         }
 
-        m_controlLoop = new java.util.Timer();
+        mControlLoop = new java.util.Timer();
 
 
-        m_P = Kp;
-        m_I = Ki;
-        m_D = Kd;
-        m_F = Kf;
+        mP = Kp;
+        mI = Ki;
+        mD = Kd;
+        mF = Kf;
 
-        m_pidInput = source;
-        m_pidOutput = output;
-        m_period = period;
+        mPidInput = source;
+        mPidOutput = output;
+        mPeriod = period;
 
-        m_controlLoop.schedule(new PIDTask(this), 0L, (long) (m_period * 1000));
+        mControlLoop.schedule(new PIDTask(this), 0L, (long) (mPeriod * 1000));
 
-        instances++;
-        //HLUsageReporting.reportPIDController(instances);
-        m_tolerance = new NullTolerance();
+        msInstances++;
+        //HLUsageReporting.reportPIDController(msInstances);
+        mTolerance = new NullTolerance();
     }
 
     /**
@@ -172,7 +172,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      */
     public OzPIDController(double Kp, double Ki, double Kd,
                          PIDSource source, PIDOutput output) {
-        this(Kp, Ki, Kd, source, output, kDefaultPeriod);
+        this(Kp, Ki, Kd, source, output, msDefaultPeriod);
     }
 
     /**
@@ -186,19 +186,19 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      */
     public OzPIDController(double Kp, double Ki, double Kd, double Kf,
                          PIDSource source, PIDOutput output) {
-        this(Kp, Ki, Kd, Kf, source, output, kDefaultPeriod);
+        this(Kp, Ki, Kd, Kf, source, output, msDefaultPeriod);
     }
 
     /**
      * Free the PID object
      */
     public void free() {
-      m_controlLoop.cancel();
+      mControlLoop.cancel();
       synchronized (this) {
-        m_freed = true;
-        m_pidOutput = null;
-        m_pidInput = null;
-        m_controlLoop = null;
+        mFreed = true;
+        mPidOutput = null;
+        mPidInput = null;
+        mControlLoop = null;
       }
       if(this.table!=null) table.removeTableListener(listener);
     }
@@ -213,14 +213,14 @@ public class OzPIDController implements LiveWindowSendable, Controller {
         PIDSource pidInput;
 
         synchronized (this) {
-            if (m_pidInput == null) {
+            if (mPidInput == null) {
                 return;
             }
-            if (m_pidOutput == null) {
+            if (mPidOutput == null) {
                 return;
             }
-            enabled = m_enabled; // take snapshot of these values...
-            pidInput = m_pidInput;
+            enabled = mEnabled; // take snapshot of these values...
+            pidInput = mPidInput;
         }
 
         if (enabled) {
@@ -231,42 +231,42 @@ public class OzPIDController implements LiveWindowSendable, Controller {
               input = pidInput.pidGet();
             }
             synchronized (this) {
-                m_error = m_setpoint - input;
-                if (m_continuous) {
-                    if (Math.abs(m_error)
-                            > (m_maximumInput - m_minimumInput) / 2) {
-                        if (m_error > 0) {
-                            m_error = m_error - m_maximumInput + m_minimumInput;
+                mError = mSetpoint - input;
+                if (mContinuous) {
+                    if (Math.abs(mError)
+                            > (mMaximumInput - mMinimumInput) / 2) {
+                        if (mError > 0) {
+                            mError = mError - mMaximumInput + mMinimumInput;
                         } else {
-                            m_error = m_error
-                                      + m_maximumInput - m_minimumInput;
+                            mError = mError
+                                      + mMaximumInput - mMinimumInput;
                         }
                     }
                 }
 
-                if (m_I != 0) {
-                    double potentialIGain = (m_totalError + m_error) * m_I;
-                    if (potentialIGain < m_maximumOutput) {
-                        if (potentialIGain > m_minimumOutput) {
-                            m_totalError += m_error;
+                if (mI != 0) {
+                    double potentialIGain = (mTotalError + mError) * mI;
+                    if (potentialIGain < mMaximumOutput) {
+                        if (potentialIGain > mMinimumOutput) {
+                            mTotalError += mError;
                         } else {
-                            m_totalError = m_minimumOutput / m_I;
+                            mTotalError = mMinimumOutput / mI;
                         }
                     } else {
-                        m_totalError = m_maximumOutput / m_I;
+                        mTotalError = mMaximumOutput / mI;
                     }
                 }
 
-                m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError) + m_setpoint * m_F;
-                m_prevError = m_error;
+                mResult = mP * mError + mI * mTotalError + mD * (mError - mPrevError) + mSetpoint * mF;
+                mPrevError = mError;
 
-                if (m_result > m_maximumOutput) {
-                    m_result = m_maximumOutput;
-                } else if (m_result < m_minimumOutput) {
-                    m_result = m_minimumOutput;
+                if (mResult > mMaximumOutput) {
+                    mResult = mMaximumOutput;
+                } else if (mResult < mMinimumOutput) {
+                    mResult = mMinimumOutput;
                 }
-                pidOutput = m_pidOutput;
-                result = m_result;
+                pidOutput = mPidOutput;
+                result = mResult;
             }
 
             pidOutput.pidWrite(result);
@@ -281,9 +281,9 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @param d Differential coefficient
      */
     public synchronized void setPID(double p, double i, double d) {
-        m_P = p;
-        m_I = i;
-        m_D = d;
+        mP = p;
+        mI = i;
+        mD = d;
 
         if (table != null) {
             table.putNumber("p", p);
@@ -301,10 +301,10 @@ public class OzPIDController implements LiveWindowSendable, Controller {
     * @param f Feed forward coefficient
     */
     public synchronized void setPID(double p, double i, double d, double f) {
-        m_P = p;
-        m_I = i;
-        m_D = d;
-        m_F = f;
+        mP = p;
+        mI = i;
+        mD = d;
+        mF = f;
 
         if (table != null) {
             table.putNumber("p", p);
@@ -319,7 +319,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return proportional coefficient
      */
     public synchronized double getP() {
-        return m_P;
+        return mP;
     }
 
     /**
@@ -327,7 +327,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return integral coefficient
      */
     public synchronized double getI() {
-        return m_I;
+        return mI;
     }
 
     /**
@@ -335,7 +335,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return differential coefficient
      */
     public synchronized double getD() {
-        return m_D;
+        return mD;
     }
 
     /**
@@ -343,7 +343,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return feed forward coefficient
      */
     public synchronized double getF() {
-        return m_F;
+        return mF;
     }
 
     /**
@@ -352,7 +352,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return the latest calculated output
      */
     public synchronized double get() {
-        return m_result;
+        return mResult;
     }
 
     /**
@@ -363,7 +363,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @param continuous Set to true turns on continuous, false turns off continuous
      */
     public synchronized void setContinuous(boolean continuous) {
-        m_continuous = continuous;
+        mContinuous = continuous;
     }
 
     /**
@@ -386,9 +386,9 @@ public class OzPIDController implements LiveWindowSendable, Controller {
         if (minimumInput > maximumInput) {
             throw new BoundaryException("Lower bound is greater than upper bound");
         }
-        m_minimumInput = minimumInput;
-        m_maximumInput = maximumInput;
-        setSetpoint(m_setpoint);
+        mMinimumInput = minimumInput;
+        mMaximumInput = maximumInput;
+        setSetpoint(mSetpoint);
     }
 
     /**
@@ -401,8 +401,8 @@ public class OzPIDController implements LiveWindowSendable, Controller {
         if (minimumOutput > maximumOutput) {
             throw new BoundaryException("Lower bound is greater than upper bound");
         }
-        m_minimumOutput = minimumOutput;
-        m_maximumOutput = maximumOutput;
+        mMinimumOutput = minimumOutput;
+        mMaximumOutput = maximumOutput;
     }
 
     /**
@@ -410,20 +410,20 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @param setpoint the desired setpoint
      */
     public synchronized void setSetpoint(double setpoint) {
-        if (m_maximumInput > m_minimumInput) {
-            if (setpoint > m_maximumInput) {
-                m_setpoint = m_maximumInput;
-            } else if (setpoint < m_minimumInput) {
-                m_setpoint = m_minimumInput;
+        if (mMaximumInput > mMinimumInput) {
+            if (setpoint > mMaximumInput) {
+                mSetpoint = mMaximumInput;
+            } else if (setpoint < mMinimumInput) {
+                mSetpoint = mMinimumInput;
             } else {
-                m_setpoint = setpoint;
+                mSetpoint = setpoint;
             }
         } else {
-            m_setpoint = setpoint;
+            mSetpoint = setpoint;
         }
 
         if (table != null)
-            table.putNumber("setpoint", m_setpoint);
+            table.putNumber("setpoint", mSetpoint);
     }
 
     /**
@@ -431,7 +431,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return the current setpoint
      */
     public synchronized double getSetpoint() {
-        return m_setpoint;
+        return mSetpoint;
     }
 
     /**
@@ -439,8 +439,8 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return the current error
      */
     public synchronized double getError() {
-        //return m_error;
-        return getSetpoint() - m_pidInput.pidGet();
+        //return mError;
+        return getSetpoint() - mPidInput.pidGet();
     }
 
     /**
@@ -451,7 +451,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      */
     @Deprecated
   public synchronized void setTolerance(double percent) {
-        m_tolerance = new PercentageTolerance(percent);
+        mTolerance = new PercentageTolerance(percent);
     }
 
     /** Set the PID tolerance using a Tolerance object.
@@ -462,7 +462,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * or AbsoluteTolerance
      */
     private synchronized void setTolerance(Tolerance tolerance) {
-        m_tolerance = tolerance;
+        mTolerance = tolerance;
     }
 
     /**
@@ -471,7 +471,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @param absvalue absolute error which is tolerable in the units of the input object
      */
     public synchronized void setAbsoluteTolerance(double absvalue) {
-        m_tolerance = new AbsoluteTolerance(absvalue);
+        mTolerance = new AbsoluteTolerance(absvalue);
     }
 
     /**
@@ -480,7 +480,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @param percentage percent error which is tolerable
      */
     public synchronized void setPercentTolerance(double percentage) {
-        m_tolerance = new PercentageTolerance(percentage);
+        mTolerance = new PercentageTolerance(percentage);
     }
 
     /**
@@ -490,7 +490,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * @return true if the error is less than the tolerance
      */
     public synchronized boolean onTarget() {
-        return m_tolerance.onTarget();
+        return mTolerance.onTarget();
     }
 
     /**
@@ -498,7 +498,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      */
     @Override
   public synchronized void enable() {
-        m_enabled = true;
+        mEnabled = true;
 
         if (table != null) {
             table.putBoolean("enabled", true);
@@ -510,8 +510,8 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      */
     @Override
     public synchronized void disable() {
-        m_pidOutput.pidWrite(0);
-        m_enabled = false;
+        mPidOutput.pidWrite(0);
+        mEnabled = false;
 
         if (table != null) {
             table.putBoolean("enabled", false);
@@ -522,7 +522,7 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      * Return true if OzPIDController is enabled.
      */
     public synchronized boolean isEnable() {
-        return m_enabled;
+        return mEnabled;
     }
 
     /**
@@ -530,9 +530,9 @@ public class OzPIDController implements LiveWindowSendable, Controller {
      */
     public synchronized void reset() {
         disable();
-        m_prevError = 0;
-        m_totalError = 0;
-        m_result = 0;
+        mPrevError = 0;
+        mTotalError = 0;
+        mResult = 0;
     }
 
     @Override
