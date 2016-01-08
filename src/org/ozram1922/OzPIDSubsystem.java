@@ -1,6 +1,5 @@
 package org.ozram1922;
 
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.PIDOutput;
 import edu.wpi.first.wpilibj.PIDSource;
@@ -9,11 +8,11 @@ import edu.wpi.first.wpilibj.tables.ITable;
 
 /**
  * This class is designed to handle the case where there is a {@link Subsystem}
- * which uses a single {@link PIDController} almost constantly (for instance,
+ * which uses a single {@link OzVDPIDController} almost constantly (for instance,
  * an elevator which attempts to stay at a constant height).
  *
- * <p>It provides some convenience methods to run an internal {@link PIDController}.
- * It also allows access to the internal {@link PIDController} in order to give total control
+ * <p>It provides some convenience methods to run an internal {@link OzVDPIDController}.
+ * It also allows access to the internal {@link OzVDPIDController} in order to give total control
  * to the programmer.</p>
  *
  * @author Joe Grinstead
@@ -22,8 +21,8 @@ import edu.wpi.first.wpilibj.tables.ITable;
  //TODO: Fix the documentation so its OURS, not just clearly copy-paste'd from the WPILib code
 public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
 
-    /** The internal {@link PIDController} */
-    private PIDController controller;
+    /** The internal {@link OzVDPIDController} */
+    private OzVDPIDController controller;
     /** An output which calls {@link PIDCommand#usePIDOutput(double)} */
     private PIDOutput output = new PIDOutput() {
 
@@ -48,7 +47,7 @@ public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
      */
     public OzPIDSubsystem(String name, double p, double i, double d) {
         super(name);
-        controller = new PIDController(p, i, d, source, output);
+        controller = new OzVDPIDController(p, i, d, source, output);
     }
 
     /**
@@ -61,7 +60,7 @@ public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
      */
     public OzPIDSubsystem(String name, double p, double i, double d, double f) {
         super(name);
-        controller = new PIDController(p, i, d, f, source, output);
+        controller = new OzVDPIDController(p, i, d, f, source, output);
     }
 
     /**
@@ -75,7 +74,7 @@ public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
      */
     public OzPIDSubsystem(String name, double p, double i, double d, double f, double period) {
         super(name);
-        controller = new PIDController(p, i, d, f, source, output, period);
+        controller = new OzVDPIDController(p, i, d, f, source, output, period);
     }
 
     /**
@@ -86,7 +85,7 @@ public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
      * @param d the derivative value
      */
     public OzPIDSubsystem(double p, double i, double d) {
-        controller = new PIDController(p, i, d, source, output);
+        controller = new OzVDPIDController(p, i, d, source, output);
     }
 
     /**
@@ -101,7 +100,7 @@ public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
      * @param period the time (in seconds) between calculations
      */
     public OzPIDSubsystem(double p, double i, double d, double period, double f) {
-        controller = new PIDController(p, i, d, f, source, output, period);
+        controller = new OzVDPIDController(p, i, d, f, source, output, period);
     }
 
     /**
@@ -115,16 +114,16 @@ public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
      * @param period the time (in seconds) between calculations
      */
     public OzPIDSubsystem(double p, double i, double d, double period) {
-        controller = new PIDController(p, i, d, source, output, period);
+        controller = new OzVDPIDController(p, i, d, source, output, period);
     }
 
     /**
-     * Returns the {@link PIDController} used by this {@link OzPIDSubsystem}.
+     * Returns the {@link OzVDPIDController} used by this {@link OzPIDSubsystem}.
      * Use this if you would like to fine tune the pid loop.
      *
-     * @return the {@link PIDController} used by this {@link OzPIDSubsystem}
+     * @return the {@link OzVDPIDController} used by this {@link OzPIDSubsystem}
      */
-    public PIDController getPIDController() {
+    public OzVDPIDController getPIDController() {
         return controller;
     }
 
@@ -237,14 +236,14 @@ public abstract class OzPIDSubsystem extends Subsystem implements Sendable {
     protected abstract void usePIDOutput(double output);
 
     /**
-     * Enables the internal {@link PIDController}
+     * Enables the internal {@link OzVDPIDController}
      */
     public void enable() {
         controller.enable();
     }
 
     /**
-     * Disables the internal {@link PIDController}
+     * Disables the internal {@link OzVDPIDController}
      */
     public void disable() {
         controller.disable();

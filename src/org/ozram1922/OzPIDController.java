@@ -11,13 +11,13 @@ import edu.wpi.first.wpilibj.tables.ITableListener;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 /**
- * Class implements a PID Control Loop.
+ * Class implements a unit within a variable-differential PID Control Loop.
  *
- * Creates a separate thread which reads the given PIDSource and takes
- * care of the integral calculations, as well as writing the given
- * PIDOutput
+ * Designed to be run from a separate thread on OzVDPIDController each cycle, NOT to be used on its own
  */
-public class OzPIDController implements LiveWindowSendable, Controller {
+
+ //TODO: Make this work as a single unit not to have its own thread
+private class OzPIDController implements LiveWindowSendable, Controller {
 
     public static final double msDefaultPeriod = .05;
     private static int msInstances = 0;
