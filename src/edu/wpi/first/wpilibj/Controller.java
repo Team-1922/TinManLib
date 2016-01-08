@@ -11,7 +11,7 @@ package edu.wpi.first.wpilibj;
  *
  * @author alex
  */
-interface Controller {
+public interface Controller {
     /**
      * Allows the control loop to run.
      */
