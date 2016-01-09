@@ -1,0 +1,14 @@
+This is an outline of how the variable-differential pid controller should work
+
+initialization
+  Parameters:
+    -number of differentiation levels
+    -(optional):PID(F) values for each differentiation level
+    -other default PID controller things
+
+controller loop
+  -is the 0th derivative setpoint met?, yes = stop, no = continue
+  -is the 1st derivative setpoint met?, yes = continue moving at speed, no = continue
+  -is the 2nd derivative setpoint met?, yes = continue accelerating at this rate, no = continue
+  -... STOP
+  -

@@ -16,7 +16,13 @@
 
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}" classpath="${lib.dir}/NetworkTables.jar"/>
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${classes.dir}">
+          <classpath>
+            <fileset dir="${lib.dir}">
+              <include name="*.jar" />
+            </fileset>
+          </classpath>
+        </javac>
     </target>
 
     <target name="jar" depends="compile">

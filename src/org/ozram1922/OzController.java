@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.wpi.first.wpilibj;
+ package org.ozram1922;
 
 /**
  * An interface for controllers. Controllers run control loops, the most command
@@ -11,7 +11,7 @@ package edu.wpi.first.wpilibj;
  *
  * @author alex
  */
-public interface Controller {
+public interface OzController {
     /**
      * Allows the control loop to run.
      */
