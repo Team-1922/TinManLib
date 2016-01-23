@@ -2,7 +2,14 @@ package org.ozram1922.cfg;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.dom.DOMSource;
 import java.io.FileInputStream;
+import java.io.File;
 import org.xml.sax.InputSource;
 import java.util.ArrayList;
 import org.w3c.dom.Element;
@@ -57,7 +64,7 @@ public class CfgLoader
        for(ConfigurableClass cfg : mCfgClasses)
        {
          //try to find a node with the ID of the class (this is how we know which node is which)
-         int id = cfg.GetID();
+         //int id = cfg.GetID();
 
          String title = cfg.GetElementTitle();
 
@@ -65,18 +72,9 @@ public class CfgLoader
          NodeList elements = rootElement.getElementsByTagName(title);
          Element foundElement = null;
 
-         //find the one with the given ID
-         for(int i = 0; i < elements.getLength(); ++i)
+         if(elements.getLength() != 0)
          {
-           Element element = (Element)elements.item(i);
-           int elementId = Integer.parseInt(element.getAttribute("id"));
-
-           //is it the right element?
-           if(elementId == id)
-           {
-             foundElement = element;
-             break;
-           }
+           foundElement = (Element)elements.item(0);
          }
 
          //if(foundElement == null) DO NOTHING: handling this will be down to the class parsing
@@ -122,6 +120,16 @@ public class CfgLoader
              rootElement.appendChild(element);
            }
        }
+
+       //add the root element
+       doc.appendChild(rootElement);
+
+       //save the file
+       Transformer transformer = TransformerFactory.newInstance().newTransformer();
+       Result output = new StreamResult(new File(filePath));
+       Source input = new DOMSource(doc);
+
+       transformer.transform(input, output);
 
     } catch (Exception ex) {
        ex.printStackTrace();

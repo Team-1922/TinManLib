@@ -1,4 +1,4 @@
-<project name="OzWPILib" basedir="." default="main">
+<project name="OzLib" basedir="." default="main">
 
 
     <property name="src.dir"     value="src"/>
@@ -17,11 +17,11 @@
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
         <javac includeantruntime="false" srcdir="${src.dir}" excludes="org/ozram1922/pid/*" destdir="${classes.dir}">
-          <classpath>
+          <!--<classpath>
             <fileset dir="${lib.dir}">
               <include name="*.jar" />
             </fileset>
-          </classpath>
+          </classpath>-->
         </javac>
     </target>
 

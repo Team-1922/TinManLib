@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 
 public class CSVLoader
 {
-  static ArrayList<ArrayList<Double>> LoadCSVFile(Path filePath) throws IOException
+  static public ArrayList<ArrayList<Double>> LoadCSVFile(Path filePath) throws IOException
   {
     List<String> lineList;
     try {
